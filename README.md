@@ -7,6 +7,7 @@ Convert your geotagged videos to georeferenced still frames using python! This p
 - [FFmpeg](https://www.ffmpeg.org/) 
 - [ExifTool](https://exiftool.org/)
 - [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/)
+- [geopy](https://github.com/geopy/geopy) (optional)
 
 ### Installation instructions 
 This is currently only tested on windows.
@@ -19,18 +20,23 @@ I used the [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) build.
 
 `python -m pip install ffmpeg-python, beautifulsoup4`
 
+Optional:
+`python -m pip install geopy`
+
 ## Usage
 ```
-usage: video2geoimg.py [-h] -i INPUT [-o OUTPUT] [-iv INTERVAL]
+usage: video2geoimg.py [-h] -i INPUT [-o OUTPUT] [-iv INTERVAL] [-m {METERS,SECONDS}]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
-                        geotagged input video
+                        input mp4
   -o OUTPUT, --output OUTPUT
                         output directory for images
   -iv INTERVAL, --interval INTERVAL
-                        interval in seconds at which the photos need to be filtered
+                        interval at which the photos need to be filtered (default is 5)
+  -m {METERS,SECONDS}, --method {METERS,SECONDS}
+                        unit that is used to calculate where to take the frames (default is SECONDS)
 ```
 Example takes my_video as input and puts photos at a 2 sec interval in the geo-photos directory:
 
