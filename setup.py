@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 # Retrieve __version__ from the package.
 
 PACKAGE_NAME = "video2geoimg"
-VERSION = runpy.run_path("video2geoimg/version.py")["__version__"]
+VERSION = runpy.run_path("version.py")["__version__"]
 DESCRIPTION = "video2geoimg: Convert your geotagged videos to georeferenced still frames using python"
 URL = "https://github.com/LaurensJN/video2geoimg"
 AUTHOR = "L.J.N. Oostwegel"
