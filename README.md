@@ -16,12 +16,9 @@ This is currently only tested on windows.
 I used the [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) build.
 - Download Exiftool at: https://exiftool.org/ and follow installation instructions.
 - Add the folder with ExifTool.exe and the folder with FFmpeg.exe to your PATH environment variables. 
-- Type in command prompt:
+- In git bash type:
 
-`python -m pip install ffmpeg-python, beautifulsoup4`
-
-Optional:
-`python -m pip install geopy`
+`python -m pip install 'git+https://github.com/LaurensJN/video2geoimg.git'`
 
 ## Usage
 ```
