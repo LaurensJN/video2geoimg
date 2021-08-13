@@ -39,4 +39,7 @@ Example takes my_video as input and puts photos at a 2 sec interval in the geo-p
 The output format is currently always JPG, because PNG does not work well with georeferenced photos and for some reason ExifTool does not like TIF images.
 
 ## License
-Licensed under [GPL-3.0-or-later](LICENSE)
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
