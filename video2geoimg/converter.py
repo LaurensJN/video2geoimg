@@ -23,16 +23,17 @@ class Converter:
         self.method = method
 
         if output_dir is not None:
-            self.output_dir = output_dir + "/"
+            self.output_dir = output_dir
         else:
-            self.output_dir = self.stripped_input + "/"
+            self.output_dir = self.stripped_input
+
         if not os.path.exists(self.output_dir):
             os.mkdir(self.output_dir)
 
     def write_gpx(self):
-        cline = f"{EXIFTOOL} -p fmt_file/gpx.fmt -ee {self.input_file} > {self.output_dir}out.gpx"
+        self.gps_file = f"{self.output_dir}/out.gpx"
+        cline = f"{EXIFTOOL} -p fmt_file/gpx.fmt -ee {self.input_file} > {self.gps_file}"
         os.system(cline)
-        self.gps_file = f"{self.output_dir}out.gpx"
 
     def import_gpx(self):
         with open(self.gps_file) as f:
@@ -62,7 +63,7 @@ class Converter:
         stream = (ffmpeg
                   .input(self.input_file)
                   .filter("fps", fps=1 / self.interval)
-                  .output(f"{self.output_dir}{self.stripped_input}-%d.{self.output_format}")
+                  .output(f"{self.output_dir}/{self.stripped_input}-%d.{self.output_format}")
                   )
         stream.run()
         return
@@ -94,12 +95,12 @@ class Converter:
         return photos
 
     def convert_to_photo(self, timestamp, idx):
-        timestamp_in_seconds = timestamp - self.timestamp
-        output_file = f"{self.output_dir}{self.stripped_input}-{idx}.{self.output_format}"
+        timestamp_in_seconds = str(timestamp - self.timestamp)
+        output_file = f"{self.output_dir}/{self.stripped_input}-{idx}.{self.output_format}"
 
         stream = ffmpeg.input(self.input_file)
         # TODO following code is not clean. Should find a better solution.
-        ffmpeg.nodes.get_stream_spec_nodes(stream)[0].kwargs['ss'] = str(timestamp_in_seconds)
+        ffmpeg.nodes.get_stream_spec_nodes(stream)[0].kwargs['ss'] = timestamp_in_seconds
 
         stream = stream.output(output_file, frames=1)
         stream.run(overwrite_output=True)
@@ -110,7 +111,7 @@ class Converter:
         photo_idx = 1
         photos = []
         while True:
-            photo = f"{self.output_dir}{self.stripped_input}-{photo_idx}.{self.output_format}"
+            photo = f"{self.output_dir}/{self.stripped_input}-{photo_idx}.{self.output_format}"
             if not os.path.isfile(photo):
                 return photos
 
@@ -128,7 +129,7 @@ class Converter:
         os.system(cline)
 
     def add_photo_georeferencing(self):
-        cline = f'{EXIFTOOL} -v2 -geotag "{self.output_dir}out.gpx" "-geotime<${{createdate}}+00:00" {self.output_dir}'
+        cline = f'{EXIFTOOL} -v2 -geotag "{self.gps_file}" "-geotime<${{createdate}}+00:00" {self.output_dir}'
         # cline = f'exiftool -v2 -geotag "{self.input_file}" "-xmp:geotime<createdate" {self.output_dir}'
         print(cline)
         os.system(cline)

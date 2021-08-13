@@ -1,5 +1,5 @@
 import argparse
-from converter import Converter
+from .converter import Converter
 
 mkdir = 'mkdir test2'
 videofile = "GH011020.MP4"
