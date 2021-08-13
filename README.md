@@ -18,7 +18,7 @@ I used the [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) build.
 - Add the folder with ExifTool.exe and the folder with FFmpeg.exe to your PATH environment variables. 
 - In git bash type:
 
-`python -m pip install 'git+https://github.com/LaurensJN/video2geoimg.git'`
+`python -m pip install 'git+https://github.com/LaurensJN/video2geoimg.git' --user`
 
 ## Usage
 ```
