@@ -1,21 +1,21 @@
 import argparse
-from converter import Converter
+import sys
+from .converter import Converter
 
 mkdir = 'mkdir test2'
 videofile = "GH011020.MP4"
 output_dir = "output"
 interval = 5 # interval in seconds
 
-if __name__ == '__main__':
+def main(args=None):
     # Example:
     # mp4togeoimg -i GH011021.MP4
-
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-i", "--input", type=str, help="input mp4", required=True)
     parser.add_argument("-o", "--output", type=str, help="output directory for images")
     parser.add_argument("-iv", "--interval", type=int, default=5,
                         help="interval at which the photos need to be filtered (default is 5)")
-    parser.add_argument("-m", "--method", type=str, choices=["METERS", "SECONDS"],default="SECONDS",
+    parser.add_argument("-m", "--method", type=str, choices=["METERS", "SECONDS"], default="SECONDS",
                         help="unit that is used to calculate where to take the frames (default is SECONDS)")
     # parser.add_argument("-f", "--format", type=str, help="output format (jpg/png/tif)")
     args = parser.parse_args()
@@ -35,6 +35,10 @@ if __name__ == '__main__':
     c.write_gpx()
     c.import_gpx()
     c.convert_to_photos()
+
+if __name__ == '__main__':
+    sys.exit(main())
+
 
 
 
