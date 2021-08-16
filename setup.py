@@ -37,23 +37,21 @@ def get_requirements():
     return packages
 
 
-if __name__ == "__main__":
-
-    setup(
-        # Metadata
-        name=PACKAGE_NAME,
-        version=VERSION,
-        author=AUTHOR,
-        description=DESCRIPTION,
-        url=URL,
-        long_description=LONG_DESCRIPTION,
-        licence=LICENSE,
-        python_requires=">3.6",
-        # Package info
-        packages=["video2geoimg"],
-        install_requires=get_requirements(),
-        zip_safe=True,
-        include_dirs=["video2geoimg", "fmt_file"],
-        classifiers=CLASSIFIERS,
-        entry_points={"console_scripts": ["video2geoimg = video2geoimg.video2geoimg:main"]},
-    )
+setup(
+    # Metadata
+    name=PACKAGE_NAME,
+    version=VERSION,
+    author=AUTHOR,
+    description=DESCRIPTION,
+    url=URL,
+    long_description=LONG_DESCRIPTION,
+    license=LICENSE,
+    python_requires=">3.6",
+    # Package info
+    packages=find_packages(),
+    install_requires=get_requirements(),
+    zip_safe=True,
+    include_dirs=["video2geoimg", "fmt_file"],
+    classifiers=CLASSIFIERS,
+    entry_points={"console_scripts": ['video2geoimg = video2geoimg.__main__:main']},
+)

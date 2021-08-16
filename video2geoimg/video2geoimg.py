@@ -1,13 +1,9 @@
 import argparse
 import sys
-from .converter import Converter
+from video2geoimg.converter import Converter
 
-mkdir = 'mkdir test2'
-videofile = "GH011020.MP4"
-output_dir = "output"
-interval = 5 # interval in seconds
 
-def main(args=None):
+def cmdline(args=None):
     # Example:
     # mp4togeoimg -i GH011021.MP4
     parser = argparse.ArgumentParser(description="")
@@ -36,9 +32,6 @@ def main(args=None):
     c.import_gpx()
     c.convert_to_photos()
 
+
 if __name__ == '__main__':
-    sys.exit(main())
-
-
-
-
+    sys.exit(cmdline())

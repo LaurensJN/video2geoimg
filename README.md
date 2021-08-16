@@ -37,7 +37,7 @@ optional arguments:
 ```
 Example takes my_video as input and puts photos at a 2 sec interval in the geo-photos directory:
 
-`python -m video2geoimg.video2geoimg -i my_video.mp4 -o "geo-photos" -iv 2`
+`python -m video2geoimg -i my_video.mp4 -o "geo-photos" -iv 2`
 
 The output format is currently always JPG, because PNG does not work well with georeferenced photos and for some reason ExifTool does not like TIF images.
 
