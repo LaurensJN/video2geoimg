@@ -3,6 +3,8 @@ import subprocess
 import ffmpeg
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
+from tqdm import tqdm
+from geopy.distance import geodesic
 import math
 
 EXIFTOOL = "exiftool"
@@ -32,7 +34,8 @@ class Converter:
 
     def write_gpx(self):
         self.gps_file = f"{self.output_dir}/out.gpx"
-        cline = f"{EXIFTOOL} -p fmt_file/gpx.fmt -ee {self.input_file} > {self.gps_file}"
+        fmt_location = os.path.abspath(os.path.join(__file__, '..', 'gpx.fmt'))
+        cline = f"{EXIFTOOL} -p {fmt_location} -ee {self.input_file} > {self.gps_file}"
         os.system(cline)
 
     def import_gpx(self):
@@ -69,40 +72,40 @@ class Converter:
         return
 
     def convert_to_photos_meters(self):
-        try:
-            from geopy.distance import geodesic
-            using_geopy = True
-        except ImportError as err:
-            print(f"{err}. Using the manual method (less accurate)...")
-            using_geopy = False
-
-        prev_tp = self.gps_data[0]
-        i = 0
         photos = []
-        for tp in self.gps_data:
-            # first photo will always be converted.
-            if using_geopy:
-                distance = geodesic((tp["lat"], tp["lon"]), (prev_tp["lat"], prev_tp["lon"])).meters
-            else:
-                distance = self.latlon_distance((tp["lat"], tp["lon"]), (prev_tp["lat"], prev_tp["lon"]))
-
-            if distance > self.interval:
-                i += 1
-                photo = self.convert_to_photo(tp["time"], i)
-                prev_tp = tp
-                self.add_photo_metadata(photo, tp["time"])
-                photos.append(photo)
+        timestamps = self.get_timestamp_meters()
+        for idx in tqdm(range(len(timestamps))):
+            photo = self.convert_to_photo(timestamps[idx], idx)
+            self.add_photo_metadata(photo, timestamps[idx])
+            photos.append(photo)
         return photos
+
+    def get_timestamp_meters(self):
+        timestamps = []
+        full_distance = 0
+        photo_idx = 0
+        prev_tp = self.gps_data[0]
+        for tp in self.gps_data:
+            distance = self.calculate_distance(tp, prev_tp)
+            while full_distance + distance >= self.interval * photo_idx:
+                if distance == 0:
+                    perc = 0
+                else:
+                    perc = ((self.interval * photo_idx) - full_distance) / distance
+
+                timestamp = prev_tp["time"] + (tp["time"] - prev_tp["time"]) * perc
+                timestamps.append(timestamp)
+                photo_idx += 1
+
+            full_distance += distance
+            prev_tp = tp
+        return timestamps
 
     def convert_to_photo(self, timestamp, idx):
         timestamp_in_seconds = str(timestamp - self.timestamp)
         output_file = f"{self.output_dir}/{self.stripped_input}-{idx}.{self.output_format}"
-
-        stream = ffmpeg.input(self.input_file)
-        # TODO following code is not clean. Should find a better solution.
-        ffmpeg.nodes.get_stream_spec_nodes(stream)[0].kwargs['ss'] = timestamp_in_seconds
-
-        stream = stream.output(output_file, frames=1)
+        stream = ffmpeg.input(self.input_file, ss=timestamp_in_seconds)
+        stream = stream.output(output_file, frames=1, loglevel='quiet')
         stream.run(overwrite_output=True)
 
         return output_file
@@ -117,21 +120,17 @@ class Converter:
 
             td = timedelta(seconds=(photo_idx - 1) * self.interval)
             timestamp = self.timestamp + td
-            # geolocation = self.retrieve_geolocation(timestamp)
             self.add_photo_metadata(photo, timestamp)
             photo_idx += 1
             photos.append(photo)
 
     def add_photo_metadata(self, photo, timestamp):
         timestamp_string = self.datetime_to_exiftool(timestamp)
-        cline = f'{EXIFTOOL} {photo} "-CreateDate={timestamp_string}" "-FileCreateDate={timestamp_string}" {photo}'
-        print(cline)
+        cline = f'{EXIFTOOL} {photo} "-CreateDate={timestamp_string}" "-FileCreateDate={timestamp_string}" {photo} -q -overwrite_original'
         os.system(cline)
 
     def add_photo_georeferencing(self):
-        cline = f'{EXIFTOOL} -v2 -geotag "{self.gps_file}" "-geotime<${{createdate}}+00:00" {self.output_dir}'
-        # cline = f'exiftool -v2 -geotag "{self.input_file}" "-xmp:geotime<createdate" {self.output_dir}'
-        print(cline)
+        cline = f'{EXIFTOOL} -v2 -geotag "{self.gps_file}" "-geotime<${{createdate}}+00:00" {self.output_dir}  -q -overwrite_original'
         os.system(cline)
 
     @staticmethod
@@ -153,6 +152,12 @@ class Converter:
         return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
 
     @staticmethod
+    def calculate_distance(trackpoint1, trackpoint2):
+        distance = geodesic((trackpoint1["lat"], trackpoint1["lon"]),
+                                (trackpoint2["lat"], trackpoint2["lon"])).meters
+        return distance
+
+    @staticmethod # DEPRECATED
     def latlon_distance(origin, destination):
         """
         Calculate the Haversine distance. From https://stackoverflow.com/a/38187562/12479748.

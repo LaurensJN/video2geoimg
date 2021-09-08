@@ -9,7 +9,7 @@ def cmdline(args=None):
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-i", "--input", type=str, help="input mp4", required=True)
     parser.add_argument("-o", "--output", type=str, help="output directory for images")
-    parser.add_argument("-iv", "--interval", type=int, default=5,
+    parser.add_argument("-iv", "--interval", type=float, default=5.,
                         help="interval at which the photos need to be filtered (default is 5)")
     parser.add_argument("-m", "--method", type=str, choices=["METERS", "SECONDS"], default="SECONDS",
                         help="unit that is used to calculate where to take the frames (default is SECONDS)")
