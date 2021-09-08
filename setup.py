@@ -49,9 +49,11 @@ setup(
     python_requires=">3.6",
     # Package info
     packages=find_packages(),
+    package_data={'video2geoimg': ['gpx.fmt']},
+    include_package_data=True,
     install_requires=get_requirements(),
     zip_safe=True,
-    include_dirs=["video2geoimg", "fmt_file"],
+    include_dirs=["video2geoimg"],
     classifiers=CLASSIFIERS,
     entry_points={"console_scripts": ['video2geoimg = video2geoimg.__main__:main']},
 )
