@@ -20,6 +20,11 @@ I used the [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) build.
 
 `python -m pip install 'git+https://github.com/LaurensJN/video2geoimg.git' --user`
 
+- If you do not have git bash, you can also download this repository, open a Command Prompt, navigate to this directory and type:
+
+`python -m pip install . --user`
+
+
 ## Usage
 ```
 usage: python -m video2geoimg.video2geoimg [-h] -i INPUT [-o OUTPUT] [-iv INTERVAL] [-m {METERS,SECONDS}]
